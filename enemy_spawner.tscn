@@ -1,0 +1,111 @@
+[gd_scene load_steps=3 format=3 uid="uid://dlrlm3yisxjg2"]
+
+[ext_resource type="PackedScene" uid="uid://b8hmqhahs1fse" path="res://e_elemental.tscn" id="1_oav2e"]
+
+[sub_resource type="GDScript" id="GDScript_llqqx"]
+script/source = "extends Node2D
+
+@export var earth_elemental: PackedScene
+@export var fire_elemental: PackedScene
+@export var wind_elemental: PackedScene
+@export var earth_count: RichTextLabel
+@export var fire_count: RichTextLabel
+@export var wind_count: RichTextLabel
+@export var earth_button: Button
+@export var fire_button: Button
+@export var wind_button: Button
+@export var GO_window: Window
+@export var team : = 1
+var second_phase = 60
+var third_phase = 60*2
+var mob
+var enemies
+var enemy_spawner 
+var iter = 0
+var mana = 20
+var timer = 0.0
+var seconds_passed = 0
+var won = false
+
+
+func _get_enemies():
+	enemies = enemy_spawner.get_children()
+	
+func get_enemies():
+	return enemies
+	
+func spawn_creature(value: int):
+	if value == 1:
+		mob = earth_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-400, 400)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+	if value == 2:
+		mob = fire_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-400, 400)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+	if value == 3:
+		mob = wind_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-400, 400)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+
+func _ready():
+	var root = get_tree().get_root().get_child(0)
+	if team == 0:
+		enemy_spawner = root.get_child(3)
+	else:
+		enemy_spawner = root.get_child(4)
+	for i in range(12):
+		spawn_creature(1)
+	
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	timer+= delta
+	iter += 1
+	if iter % 10 == 0:
+		_get_enemies()
+	if timer > seconds_passed:
+		seconds_passed +=1
+		if seconds_passed == second_phase:
+				spawn_creature(2)
+		elif  seconds_passed == third_phase:
+			for i in range(2):
+				spawn_creature(3)
+		if seconds_passed < second_phase:
+			if seconds_passed % 10 == 0:
+				spawn_creature(1)
+		elif seconds_passed < third_phase:
+			if seconds_passed % 11 == 0:
+				var r = randf()
+				if r < 0.5:
+					spawn_creature(1)
+				else:
+					spawn_creature(2)
+		else:
+			if seconds_passed < 60 * 3:
+				if seconds_passed % 12 == 0:
+					var r = randf()
+					if r < 0.333:
+						spawn_creature(1)
+					elif r < 0.666:
+						spawn_creature(2)
+					else:
+						spawn_creature(3)
+			else:
+				if not won:
+					if get_child_count() < 1:
+						won = true
+						print(\"You win!\")
+						GO_window.visible = true
+"
+
+[node name="enemy_spawner" type="Node2D"]
+position = Vector2(900, 0)
+script = SubResource("GDScript_llqqx")
+earth_elemental = ExtResource("1_oav2e")

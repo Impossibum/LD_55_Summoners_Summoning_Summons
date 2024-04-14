@@ -1,0 +1,185 @@
+[gd_scene load_steps=7 format=3 uid="uid://d25gg53v3sg7n"]
+
+[ext_resource type="Texture2D" uid="uid://bnaehdcnpb74o" path="res://wind_elemental.png" id="1_rj2rh"]
+[ext_resource type="PackedScene" uid="uid://oyi7slvpteeg" path="res://dead_mob.tscn" id="1_sft3t"]
+
+[sub_resource type="GDScript" id="GDScript_uc6nb"]
+resource_name = "creature_brain"
+script/source = "#extends Node2D
+extends CharacterBody2D
+
+@export var attack_speed := 3
+@export var movement_speed :=1
+@export var attack_range :=100
+@export var team :=1
+@export var health :=40
+@export var attack_dmg :=6
+@export var dead_elemental: PackedScene
+var iter
+var target
+var parent
+var particles
+var collision
+var affected_enemies
+var skew_dir 
+var skew_max 
+var scale_max
+var attack_div
+var dist
+var col
+
+func find_enemies_in_spread():
+	affected_enemies = []
+	if parent.get_enemies() != null:
+		for e in parent.get_enemies():
+			if is_instance_valid(e):
+				dist = global_position.distance_to(e.global_position)
+				if dist <= attack_range:
+					affected_enemies.push_back(e)
+	return affected_enemies
+
+func attack_hit():
+	for enemy in find_enemies_in_spread():
+		enemy.handle_health(-attack_dmg)
+	particles.emitting = true
+	
+	
+func handle_health(value):
+	health += value
+	if health < 1:
+		queue_free()
+
+
+func find_target():
+	var dist = 0
+	var best_dist = INF
+	var best_target = null
+	if parent.get_enemies() != null:
+		for e in parent.get_enemies():
+			if is_instance_valid(e):
+				dist = global_position.distance_to(e.global_position)
+				if dist < best_dist:
+					best_dist = dist
+					best_target = e
+	return best_target
+	
+func attacking(target_obj, delta):
+	skew = 0
+	if target_obj != null and is_instance_valid(target):
+		look_at(target_obj.global_position)
+		#transform = transform.looking_at(target.global_position)
+		if scale.x < scale_max:
+			scale += Vector2(delta*attack_div, delta*attack_div)
+		else:
+			scale = Vector2(1, 1)
+			attack_hit()
+
+func move(target_obj, delta):
+	#scale = Vector2(1, 1)
+	if target_obj != null and is_instance_valid(target):
+		look_at(target_obj.global_position)
+		if global_position.distance_to(target_obj.global_position) > attack_range:
+			if abs(skew) > skew_max:
+				skew_dir = !skew_dir
+			if skew_dir:
+				skew += delta*2
+			else:
+				skew -= delta*2
+			
+			var vec = (target_obj.global_position- global_position).normalized() * movement_speed
+			col = move_and_collide(vec)
+			if col:
+				col.get_collider().velocity = vec/4
+				col.get_collider().move_and_slide()
+				#velocity = -vec/4
+				#move_and_slide()
+			
+			#transform = transform.translated((target_obj.global_position- global_position).normalized() * (delta * movement_speed))
+		else:
+			skew = 0
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	motion_mode = 0
+	parent = get_parent()
+	particles = get_child(1)
+	team =1
+	skew_dir = true
+	skew_max = 0.25
+	scale_max = 1.1
+	attack_div = 0.1/attack_speed
+	iter = 0
+	
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _physics_process(delta):
+	if is_instance_valid(self):
+		iter+=1
+		if target == null or iter > 10 or !is_instance_valid(target):
+			target = find_target()
+			iter = 0
+		if is_instance_valid(target):
+			if global_position.distance_to(target.global_position) > attack_range:
+				move(target, delta)
+			else:
+				attacking(target, delta)
+"
+
+[sub_resource type="Curve" id="Curve_l5043"]
+min_value = -360.0
+max_value = 360.0
+_data = [Vector2(0, -351.449), 0.0, 0.0, 0, 0, Vector2(1, 360), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_80rfp"]
+min_value = -1.0
+_data = [Vector2(0, -1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fyae3"]
+
+[node name="w_elemental" type="CharacterBody2D"]
+z_index = 1
+motion_mode = 1
+slide_on_ceiling = false
+wall_min_slide_angle = 0.794125
+platform_on_leave = 2
+script = SubResource("GDScript_uc6nb")
+movement_speed = 3
+health = 80
+attack_dmg = 10
+dead_elemental = ExtResource("1_sft3t")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(2, 2)
+texture = ExtResource("1_rj2rh")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+position = Vector2(-10, 0)
+emitting = false
+amount = 300
+one_shot = true
+explosiveness = 0.81
+randomness = 1.0
+lifetime_randomness = 1.0
+emission_shape = 1
+emission_sphere_radius = 100.0
+direction = Vector2(0, 0)
+gravity = Vector2(0, 0)
+angular_velocity_min = -1.0
+angular_velocity_max = 1.0
+orbit_velocity_min = 1.0
+orbit_velocity_max = 5.0
+angle_min = -720.0
+angle_max = 720.0
+angle_curve = SubResource("Curve_l5043")
+scale_amount_max = 5.0
+color = Color(0.196078, 0.615686, 0.607843, 1)
+hue_variation_min = -0.02
+hue_variation_max = 0.02
+hue_variation_curve = SubResource("Curve_80rfp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-10, 0)
+scale = Vector2(2, 2)
+shape = SubResource("CircleShape2D_fyae3")

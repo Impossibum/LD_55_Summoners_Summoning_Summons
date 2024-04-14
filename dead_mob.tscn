@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3 uid="uid://oyi7slvpteeg"]
+
+[ext_resource type="Texture2D" uid="uid://bml5hcc336x81" path="res://dead_elemental.png" id="1_8nqtb"]
+
+[sub_resource type="Gradient" id="Gradient_cy0st"]
+offsets = PackedFloat32Array(0, 0.743333, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.496667, 0.496667, 0.496667, 1, 0, 0, 0, 1)
+
+[node name="Sprite2D" type="Sprite2D"]
+z_as_relative = false
+position = Vector2(252, 0)
+scale = Vector2(2, 2)
+texture = ExtResource("1_8nqtb")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+position = Vector2(-4.5, -0.5)
+emitting = false
+amount = 500
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+lifetime_randomness = 1.0
+direction = Vector2(0, 0)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_max = 25.0
+angle_max = 360.0
+scale_amount_max = 3.0
+color = Color(0.819608, 0.796078, 0, 1)
+color_ramp = SubResource("Gradient_cy0st")
+hue_variation_min = -0.2
+hue_variation_max = 0.2

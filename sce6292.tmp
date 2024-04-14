@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://5b8oi2w1a3to"]
+
+[ext_resource type="Texture2D" uid="uid://8ywivl1g0iwf" path="res://blank.png" id="1_e4s1a"]
+[ext_resource type="Script" path="res://scene_1.gd" id="1_od3ax"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_od3ax")
+
+[node name="background" type="Node2D" parent="."]
+modulate = Color(0, 1, 0, 1)
+scale = Vector2(10, 10)
+
+[node name="Blank" type="Sprite2D" parent="background"]
+texture = ExtResource("1_e4s1a")
+
+[node name="Camera2D" type="Camera2D" parent="."]

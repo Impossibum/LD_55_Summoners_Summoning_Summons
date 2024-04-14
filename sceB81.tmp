@@ -1,0 +1,263 @@
+[gd_scene load_steps=15 format=3 uid="uid://5b8oi2w1a3to"]
+
+[ext_resource type="Texture2D" uid="uid://8ywivl1g0iwf" path="res://blank.png" id="1_e4s1a"]
+[ext_resource type="Script" path="res://scene_1.gd" id="1_od3ax"]
+[ext_resource type="Texture2D" uid="uid://d4k6wcdbskbxs" path="res://pentagram.png" id="3_qc38q"]
+[ext_resource type="PackedScene" uid="uid://b8hmqhahs1fse" path="res://e_elemental.tscn" id="4_2502w"]
+[ext_resource type="Texture2D" uid="uid://dt7los4x6caul" path="res://earth_elemental.png" id="4_p6o7l"]
+[ext_resource type="Texture2D" uid="uid://dhtu11wtohp12" path="res://flame_elemental.png" id="5_w0lnf"]
+[ext_resource type="Texture2D" uid="uid://bnaehdcnpb74o" path="res://wind_elemental.png" id="6_1woqe"]
+[ext_resource type="PackedScene" uid="uid://dd1fb4uluwldv" path="res://f_elemental.tscn" id="6_3kyai"]
+[ext_resource type="PackedScene" uid="uid://dlrlm3yisxjg2" path="res://enemy_spawner.tscn" id="7_8rfi5"]
+[ext_resource type="PackedScene" uid="uid://d25gg53v3sg7n" path="res://w_elemental.tscn" id="7_y6gm7"]
+[ext_resource type="PackedScene" uid="uid://mp4nmyjmhamb" path="res://summoner.tscn" id="9_vp0yk"]
+
+[sub_resource type="Theme" id="Theme_rmj3c"]
+
+[sub_resource type="Gradient" id="Gradient_injob"]
+
+[sub_resource type="GDScript" id="GDScript_llqqx"]
+script/source = "extends Node2D
+
+@export var earth_elemental: PackedScene
+@export var fire_elemental: PackedScene
+@export var wind_elemental: PackedScene
+@export var earth_count: RichTextLabel
+@export var fire_count: RichTextLabel
+@export var wind_count: RichTextLabel
+@export var mana_display: RichTextLabel
+@export var earth_button: Button
+@export var fire_button: Button
+@export var wind_button: Button
+@export var team : = 1
+var mob
+var enemies
+var enemy_spawner 
+var iter = 0
+var mana = 10
+var mana_timer = 0.0
+var e_count = 1
+var f_count = 1
+var w_count = 1
+
+
+func _get_enemies():
+	enemies = enemy_spawner.get_children()
+	
+func get_enemies():
+	return enemies
+	
+func spawn_creature(value: int):
+	if value == 1:
+		mob = earth_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-500, 500)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+	if value == 2:
+		mob = earth_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-500, 500)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+	if value == 2:
+		mob = earth_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-500, 500)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+			
+func update_text_displays():
+	mana_display.add_text(str(mana))
+	earth_count.add_text(str(e_count))
+	fire_count.add_text(str(f_count))
+	wind_count.add_text(str(w_count))
+
+func _ready():
+	var root = get_tree().get_root().get_child(0)
+	if team == 0:
+		enemy_spawner = root.get_child(3)
+	else:
+		enemy_spawner = root.get_child(4)
+	update_text_displays()
+	
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	iter += 1
+	mana_timer += delta
+	if iter % 10 == 0:
+		_get_enemies()
+	if mana_timer >= 1:
+		mana +=1
+		update_text_displays()
+	
+		
+
+
+func _on_button_pressed():
+	if mana >= 10:
+		mana -= 10
+		e_count +=1
+		update_text_displays()
+"
+
+[node name="_root" type="Node2D"]
+script = ExtResource("1_od3ax")
+
+[node name="background" type="Node2D" parent="."]
+modulate = Color(0.682353, 0.505882, 0.121569, 1)
+scale = Vector2(100, 100)
+
+[node name="Blank" type="Sprite2D" parent="background"]
+texture = ExtResource("1_e4s1a")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+editor_draw_limits = true
+
+[node name="ui canvas" type="Node2D" parent="."]
+
+[node name="mana label" type="Node2D" parent="ui canvas"]
+position = Vector2(-475, -475)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/mana label"]
+offset_left = -441.0
+offset_top = -41.0
+offset_right = -316.0
+offset_bottom = 9.0
+theme = SubResource("Theme_rmj3c")
+theme_override_font_sizes/normal_font_size = 35
+bbcode_enabled = true
+text = "[color=blue]MANA:[/color]"
+scroll_active = false
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="ui canvas/mana label"]
+offset_left = -318.0
+offset_top = -43.0
+offset_right = -168.0
+offset_bottom = 7.0
+theme_override_font_sizes/normal_font_size = 35
+bbcode_enabled = true
+text = "[color=white]0[/color]"
+
+[node name="pentagram" type="Sprite2D" parent="ui canvas"]
+position = Vector2(-749, 287)
+texture = ExtResource("3_qc38q")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="ui canvas/pentagram"]
+emitting = false
+amount = 400
+lifetime = 2.0
+one_shot = true
+emission_shape = 1
+emission_sphere_radius = 64.0
+gravity = Vector2(0, 0)
+orbit_velocity_min = -1.0
+orbit_velocity_max = 1.0
+damping_min = 10.0
+damping_max = 50.0
+scale_amount_min = 2.0
+scale_amount_max = 6.0
+color = Color(1, 0.607843, 0, 1)
+color_initial_ramp = SubResource("Gradient_injob")
+hue_variation_min = -0.5
+hue_variation_max = 0.5
+
+[node name="earth elemental" type="Sprite2D" parent="ui canvas"]
+position = Vector2(-877, 437)
+rotation = 1.5708
+scale = Vector2(2, 2)
+texture = ExtResource("4_p6o7l")
+
+[node name="Button" type="Button" parent="ui canvas/earth elemental"]
+offset_left = 13.0
+offset_top = 36.5
+offset_right = 88.0
+offset_bottom = 67.5
+rotation = -1.5708
+tooltip_text = "Spend x amount of mana to summon the above minion"
+text = "10 mana"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/earth elemental"]
+offset_left = -40.0
+offset_top = 9.0
+offset_bottom = 49.0
+rotation = -1.5708
+tooltip_text = "How many creatures of this type that are ready to be released"
+text = "0"
+
+[node name="flame elemental" type="Sprite2D" parent="ui canvas"]
+position = Vector2(-696, 437)
+rotation = 1.5708
+scale = Vector2(2, 2)
+texture = ExtResource("5_w0lnf")
+
+[node name="Button" type="Button" parent="ui canvas/flame elemental"]
+offset_left = 13.0
+offset_top = 36.5
+offset_right = 88.0
+offset_bottom = 67.5
+rotation = -1.5708
+tooltip_text = "Spend x amount of mana to summon the above minion"
+action_mode = 0
+text = "20 mana"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/flame elemental"]
+offset_left = -40.0
+offset_top = 9.0
+offset_bottom = 49.0
+rotation = -1.5708
+tooltip_text = "How many creatures of this type that are ready to be released"
+text = "0"
+
+[node name="wind elemental" type="Sprite2D" parent="ui canvas"]
+position = Vector2(-516, 437)
+rotation = 1.5708
+scale = Vector2(2, 2)
+texture = ExtResource("6_1woqe")
+
+[node name="Button" type="Button" parent="ui canvas/wind elemental"]
+offset_left = 13.0
+offset_top = 36.5
+offset_right = 88.0
+offset_bottom = 67.5
+rotation = -1.5708
+tooltip_text = "Spend x amount of mana to summon the above minion"
+text = "30 mana"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/wind elemental"]
+offset_left = -40.0
+offset_top = 9.0
+offset_bottom = 49.0
+rotation = -1.5708
+tooltip_text = "How many creatures of this type that are ready to be released"
+text = "0"
+
+[node name="Button" type="Button" parent="ui canvas"]
+offset_left = -397.0
+offset_top = 455.0
+offset_right = -150.0
+offset_bottom = 526.0
+theme_override_font_sizes/font_size = 45
+text = "Send Wave"
+
+[node name="enemy_spawner" parent="." instance=ExtResource("7_8rfi5")]
+
+[node name="player_spawner" type="Node2D" parent="." node_paths=PackedStringArray("earth_count", "fire_count", "wind_count", "mana_display", "earth_button", "fire_button", "wind_button")]
+position = Vector2(-900, 0)
+script = SubResource("GDScript_llqqx")
+earth_elemental = ExtResource("4_2502w")
+fire_elemental = ExtResource("6_3kyai")
+wind_elemental = ExtResource("7_y6gm7")
+earth_count = NodePath("../ui canvas/earth elemental/RichTextLabel")
+fire_count = NodePath("../ui canvas/flame elemental/RichTextLabel")
+wind_count = NodePath("../ui canvas/wind elemental/RichTextLabel")
+mana_display = NodePath("../ui canvas/mana label/RichTextLabel2")
+earth_button = NodePath("../ui canvas/earth elemental/Button")
+fire_button = NodePath("../ui canvas/flame elemental/Button")
+wind_button = NodePath("../ui canvas/wind elemental/Button")
+team = 0
+
+[node name="summoner" parent="player_spawner" instance=ExtResource("9_vp0yk")]
+
+[connection signal="pressed" from="ui canvas/flame elemental/Button" to="player_spawner" method="_on_button_pressed"]

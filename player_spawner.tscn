@@ -1,0 +1,149 @@
+[gd_scene load_steps=6 format=3 uid="uid://dbvsi0kmpj5ov"]
+
+[ext_resource type="PackedScene" uid="uid://b8hmqhahs1fse" path="res://e_elemental.tscn" id="1_kwwfv"]
+[ext_resource type="PackedScene" uid="uid://dd1fb4uluwldv" path="res://f_elemental.tscn" id="2_hv4wd"]
+[ext_resource type="PackedScene" uid="uid://d25gg53v3sg7n" path="res://w_elemental.tscn" id="3_vhg8k"]
+[ext_resource type="PackedScene" uid="uid://mp4nmyjmhamb" path="res://summoner.tscn" id="4_it848"]
+
+[sub_resource type="GDScript" id="GDScript_llqqx"]
+script/source = "extends Node2D
+
+@export var earth_elemental: PackedScene
+@export var fire_elemental: PackedScene
+@export var wind_elemental: PackedScene
+@export var earth_count: RichTextLabel
+@export var fire_count: RichTextLabel
+@export var wind_count: RichTextLabel
+@export var mana_display: RichTextLabel
+@export var summoning_circle: CPUParticles2D
+@export var GO_window: Window
+@export var start_window: Window
+@export var team : = 1
+var mob
+var enemies
+var enemy_spawner 
+var iter = 0
+var mana = 100
+var mana_timer = 0.0
+var e_count = 0
+var f_count = 0
+var w_count = 0
+
+
+func restart():
+	var _reload = get_tree().reload_current_scene()
+	print(\"reload called\")
+	
+func shame():
+	get_tree().quit()
+	print(\"quit called\")
+
+func game_over():
+	#get_tree().paused = true
+	GO_window.visible = true
+
+func _get_enemies():
+	enemies = enemy_spawner.get_children()
+	
+func get_enemies():
+	return enemies
+	
+func spawn_creature(value: int):
+	if value == 1:
+		mob = earth_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-400, 400)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+	if value == 2:
+		mob = fire_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-400, 400)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+	if value == 3:
+		mob = wind_elemental.instantiate()
+		add_child(mob)
+		mob.global_position.y = randf_range(-400, 400)
+		if team == 0:
+			mob.global_position.x = -1920/2 +150
+			
+func update_text_displays():
+	mana_display.clear()
+	mana_display.add_text(str(mana))
+	earth_count.clear()
+	earth_count.add_text(str(e_count))
+	fire_count.clear()
+	fire_count.add_text(str(f_count))
+	wind_count.clear()
+	wind_count.add_text(str(w_count))
+
+func _ready():
+	var root = get_tree().get_root().get_child(0)
+	if team == 0:
+		enemy_spawner = root.get_child(3)
+	else:
+		enemy_spawner = root.get_child(4)
+	update_text_displays()
+	
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	iter += 1
+	mana_timer += delta
+	if iter % 10 == 0:
+		_get_enemies()
+	if mana_timer >= 1:
+		mana +=1
+		mana_timer = 0
+		update_text_displays()
+	
+		
+
+func earth_button_pressed():
+	if mana >= 10:
+		mana -= 10
+		e_count +=1
+		update_text_displays()
+		
+func fire_button_pressed():
+	if mana >= 15:
+		mana -= 15
+		f_count +=1
+		update_text_displays()
+		
+func wind_button_pressed():
+	if mana >= 20:
+		mana -= 20
+		w_count +=1
+		update_text_displays()
+		
+func send_wave_pressed():
+	if e_count > 0 or f_count > 0 or w_count > 0:
+		for i in range(e_count):
+			spawn_creature(1)
+		for i in range(f_count):
+			spawn_creature(2)
+		for i in range(w_count):
+			spawn_creature(3)
+			
+		e_count = 0
+		f_count = 0
+		w_count = 0
+		update_text_displays()
+		summoning_circle.emitting = true
+
+
+func _on_start_pressed():
+	start_window.visible = false
+"
+
+[node name="player_spawner" type="Node2D"]
+position = Vector2(-900, 0)
+script = SubResource("GDScript_llqqx")
+earth_elemental = ExtResource("1_kwwfv")
+fire_elemental = ExtResource("2_hv4wd")
+wind_elemental = ExtResource("3_vhg8k")
+team = 0
+
+[node name="summoner" parent="." instance=ExtResource("4_it848")]

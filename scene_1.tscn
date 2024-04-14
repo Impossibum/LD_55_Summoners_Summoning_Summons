@@ -1,0 +1,341 @@
+[gd_scene load_steps=13 format=3 uid="uid://5b8oi2w1a3to"]
+
+[ext_resource type="Texture2D" uid="uid://8ywivl1g0iwf" path="res://blank.png" id="1_e4s1a"]
+[ext_resource type="Script" path="res://scene_1.gd" id="1_od3ax"]
+[ext_resource type="Texture2D" uid="uid://d4k6wcdbskbxs" path="res://pentagram.png" id="3_qc38q"]
+[ext_resource type="Texture2D" uid="uid://dt7los4x6caul" path="res://earth_elemental.png" id="4_p6o7l"]
+[ext_resource type="Texture2D" uid="uid://dhtu11wtohp12" path="res://flame_elemental.png" id="5_w0lnf"]
+[ext_resource type="Texture2D" uid="uid://bnaehdcnpb74o" path="res://wind_elemental.png" id="6_1woqe"]
+[ext_resource type="PackedScene" uid="uid://dd1fb4uluwldv" path="res://f_elemental.tscn" id="6_3kyai"]
+[ext_resource type="PackedScene" uid="uid://dlrlm3yisxjg2" path="res://enemy_spawner.tscn" id="7_8rfi5"]
+[ext_resource type="PackedScene" uid="uid://d25gg53v3sg7n" path="res://w_elemental.tscn" id="7_y6gm7"]
+[ext_resource type="PackedScene" uid="uid://dbvsi0kmpj5ov" path="res://player_spawner.tscn" id="8_v4b3u"]
+
+[sub_resource type="Theme" id="Theme_rmj3c"]
+
+[sub_resource type="Gradient" id="Gradient_injob"]
+
+[node name="_root" type="Node2D"]
+script = ExtResource("1_od3ax")
+
+[node name="background" type="Node2D" parent="."]
+modulate = Color(0.682353, 0.505882, 0.121569, 1)
+scale = Vector2(100, 100)
+
+[node name="Blank" type="Sprite2D" parent="background"]
+position = Vector2(0.18, 1.03)
+texture = ExtResource("1_e4s1a")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+editor_draw_limits = true
+
+[node name="ui canvas" type="Node2D" parent="."]
+
+[node name="mana label" type="Node2D" parent="ui canvas"]
+position = Vector2(-475, -475)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/mana label"]
+offset_left = -441.0
+offset_top = -41.0
+offset_right = -316.0
+offset_bottom = 9.0
+theme = SubResource("Theme_rmj3c")
+theme_override_font_sizes/normal_font_size = 35
+bbcode_enabled = true
+text = "[color=blue]MANA:[/color]"
+scroll_active = false
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="ui canvas/mana label"]
+offset_left = -318.0
+offset_top = -43.0
+offset_right = -168.0
+offset_bottom = 7.0
+theme_override_font_sizes/normal_font_size = 35
+bbcode_enabled = true
+text = "[color=white]0[/color]"
+
+[node name="pentagram" type="Sprite2D" parent="ui canvas"]
+position = Vector2(-583, 9)
+scale = Vector2(3, 3)
+texture = ExtResource("3_qc38q")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="ui canvas/pentagram"]
+emitting = false
+amount = 400
+lifetime = 2.0
+one_shot = true
+emission_shape = 1
+emission_sphere_radius = 64.0
+gravity = Vector2(0, 0)
+orbit_velocity_min = -1.0
+orbit_velocity_max = 1.0
+damping_min = 10.0
+damping_max = 50.0
+scale_amount_min = 6.0
+scale_amount_max = 18.0
+color = Color(1, 0.607843, 0, 1)
+color_initial_ramp = SubResource("Gradient_injob")
+hue_variation_min = -0.5
+hue_variation_max = 0.5
+
+[node name="earth elemental" type="Sprite2D" parent="ui canvas"]
+position = Vector2(-877, 437)
+rotation = 1.5708
+scale = Vector2(2, 2)
+texture = ExtResource("4_p6o7l")
+
+[node name="Button" type="Button" parent="ui canvas/earth elemental"]
+offset_left = 13.0
+offset_top = 36.5
+offset_right = 88.0
+offset_bottom = 67.5
+rotation = -1.5708
+tooltip_text = "Spend x amount of mana to summon the above minion"
+action_mode = 0
+text = "10 mana"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/earth elemental"]
+offset_left = -40.0
+offset_top = 9.0
+offset_bottom = 49.0
+rotation = -1.5708
+tooltip_text = "How many creatures of this type that are ready to be released"
+text = "0"
+
+[node name="flame elemental" type="Sprite2D" parent="ui canvas"]
+position = Vector2(-696, 437)
+rotation = 1.5708
+scale = Vector2(2, 2)
+texture = ExtResource("5_w0lnf")
+
+[node name="Button" type="Button" parent="ui canvas/flame elemental"]
+offset_left = 13.0
+offset_top = 36.5
+offset_right = 88.0
+offset_bottom = 67.5
+rotation = -1.5708
+tooltip_text = "Spend x amount of mana to summon the above minion"
+action_mode = 0
+text = "15 mana"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/flame elemental"]
+offset_left = -40.0
+offset_top = 9.0
+offset_bottom = 49.0
+rotation = -1.5708
+tooltip_text = "How many creatures of this type that are ready to be released"
+text = "0"
+
+[node name="wind elemental" type="Sprite2D" parent="ui canvas"]
+position = Vector2(-516, 437)
+rotation = 1.5708
+scale = Vector2(2, 2)
+texture = ExtResource("6_1woqe")
+
+[node name="Button" type="Button" parent="ui canvas/wind elemental"]
+offset_left = 13.0
+offset_top = 36.5
+offset_right = 88.0
+offset_bottom = 67.5
+rotation = -1.5708
+tooltip_text = "Spend x amount of mana to summon the above minion"
+action_mode = 0
+text = "20 mana"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/wind elemental"]
+offset_left = -40.0
+offset_top = 9.0
+offset_bottom = 49.0
+rotation = -1.5708
+tooltip_text = "How many creatures of this type that are ready to be released"
+text = "0"
+
+[node name="send wave" type="Button" parent="ui canvas"]
+offset_left = -397.0
+offset_top = 455.0
+offset_right = -150.0
+offset_bottom = 526.0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 45
+text = "Send Wave"
+
+[node name="game over" type="Window" parent="ui canvas"]
+title = "GAME OVER"
+initial_position = 1
+size = Vector2i(600, 500)
+visible = false
+keep_title_visible = true
+content_scale_mode = 2
+theme_override_colors/title_color = Color(1, 0, 0, 1)
+theme_override_colors/title_outline_modulate = Color(1, 1, 0, 1)
+theme_override_font_sizes/title_font_size = 45
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/game over"]
+clip_contents = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 37
+text = "
+You need to be summoning more summons with your summoner! SUMMONING!!!!!
+Try again or forever accept the shame you have wrought upon your family."
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+text_direction = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="ui canvas/game over"]
+visible = false
+scale = Vector2(100, 100)
+texture = ExtResource("1_e4s1a")
+
+[node name="restart" type="Button" parent="ui canvas/game over"]
+offset_left = 25.0
+offset_top = 450.0
+offset_right = 225.0
+offset_bottom = 500.0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "Restart"
+
+[node name="quit" type="Button" parent="ui canvas/game over"]
+offset_left = 375.0
+offset_top = 450.0
+offset_right = 575.0
+offset_bottom = 500.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "Surrender"
+
+[node name="winner" type="Window" parent="ui canvas"]
+title = "You Win!"
+initial_position = 1
+size = Vector2i(600, 500)
+visible = false
+keep_title_visible = true
+content_scale_mode = 2
+theme_override_colors/title_color = Color(1, 0, 0, 1)
+theme_override_colors/title_outline_modulate = Color(1, 1, 0, 1)
+theme_override_font_sizes/title_font_size = 45
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/winner"]
+clip_contents = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 37
+text = "
+He ran off scared! Nobody is summoning summons better than you. Or are they? Was it just a fluke?"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+text_direction = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="ui canvas/winner"]
+visible = false
+scale = Vector2(100, 100)
+texture = ExtResource("1_e4s1a")
+
+[node name="restart" type="Button" parent="ui canvas/winner"]
+offset_left = 25.0
+offset_top = 450.0
+offset_right = 225.0
+offset_bottom = 500.0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "Prove it"
+
+[node name="quit" type="Button" parent="ui canvas/winner"]
+offset_left = 375.0
+offset_top = 450.0
+offset_right = 575.0
+offset_bottom = 500.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "Surrender"
+
+[node name="starting screen" type="Window" parent="ui canvas"]
+title = "Summoners Summoning Summons!"
+initial_position = 1
+size = Vector2i(900, 500)
+visible = false
+keep_title_visible = true
+content_scale_mode = 2
+theme_override_colors/title_color = Color(1, 0, 0, 1)
+theme_override_colors/title_outline_modulate = Color(1, 1, 0, 1)
+theme_override_font_sizes/title_font_size = 45
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/starting screen"]
+clip_contents = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -250.0
+offset_right = 350.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 40
+text = "
+Some upstart summoner thinks you're not up to snuff. It's time for THE SUMMONING! Win or everyone will laugh at you and steal your action figures."
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+text_direction = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="ui canvas/starting screen"]
+visible = false
+scale = Vector2(100, 100)
+texture = ExtResource("1_e4s1a")
+
+[node name="start" type="Button" parent="ui canvas/starting screen"]
+offset_left = 310.0
+offset_top = 450.0
+offset_right = 572.0
+offset_bottom = 500.0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "Start Summoning"
+
+[node name="enemy_spawner" parent="." node_paths=PackedStringArray("GO_window") instance=ExtResource("7_8rfi5")]
+fire_elemental = ExtResource("6_3kyai")
+wind_elemental = ExtResource("7_y6gm7")
+GO_window = NodePath("../ui canvas/winner")
+
+[node name="player_spawner" parent="." node_paths=PackedStringArray("earth_count", "fire_count", "wind_count", "mana_display", "summoning_circle", "GO_window", "start_window") instance=ExtResource("8_v4b3u")]
+earth_count = NodePath("../ui canvas/earth elemental/RichTextLabel")
+fire_count = NodePath("../ui canvas/flame elemental/RichTextLabel")
+wind_count = NodePath("../ui canvas/wind elemental/RichTextLabel")
+mana_display = NodePath("../ui canvas/mana label/RichTextLabel2")
+summoning_circle = NodePath("../ui canvas/pentagram/CPUParticles2D")
+GO_window = NodePath("../ui canvas/game over")
+start_window = NodePath("../ui canvas/starting screen")
+
+[connection signal="pressed" from="ui canvas/earth elemental/Button" to="player_spawner" method="earth_button_pressed"]
+[connection signal="pressed" from="ui canvas/flame elemental/Button" to="player_spawner" method="fire_button_pressed"]
+[connection signal="pressed" from="ui canvas/wind elemental/Button" to="player_spawner" method="wind_button_pressed"]
+[connection signal="pressed" from="ui canvas/send wave" to="player_spawner" method="send_wave_pressed"]
+[connection signal="pressed" from="ui canvas/game over/restart" to="player_spawner" method="restart"]
+[connection signal="pressed" from="ui canvas/game over/quit" to="player_spawner" method="shame"]
+[connection signal="pressed" from="ui canvas/winner/restart" to="player_spawner" method="restart"]
+[connection signal="pressed" from="ui canvas/winner/quit" to="player_spawner" method="shame"]
+[connection signal="pressed" from="ui canvas/starting screen/start" to="player_spawner" method="_on_start_pressed"]

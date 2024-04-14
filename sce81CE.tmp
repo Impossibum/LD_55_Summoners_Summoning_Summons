@@ -1,0 +1,148 @@
+[gd_scene load_steps=8 format=3 uid="uid://5b8oi2w1a3to"]
+
+[ext_resource type="Texture2D" uid="uid://8ywivl1g0iwf" path="res://blank.png" id="1_e4s1a"]
+[ext_resource type="Script" path="res://scene_1.gd" id="1_od3ax"]
+[ext_resource type="Texture2D" uid="uid://224q4vsq1xrr" path="res://icon.svg" id="3_orpee"]
+[ext_resource type="Texture2D" uid="uid://dt7los4x6caul" path="res://earth_elemental.png" id="4_sxe8e"]
+
+[sub_resource type="Theme" id="Theme_rmj3c"]
+
+[sub_resource type="GDScript" id="GDScript_llqqx"]
+script/source = "extends Node2D
+
+@export var team : = 1
+var enemies
+var enemy_spawner 
+var iter = 0
+
+
+func _get_enemies():
+	enemies = enemy_spawner.get_children()
+	
+func get_enemies():
+	return enemies
+
+
+func _ready():
+	var root = get_tree().get_root().get_child(0)
+	if team == 0:
+		enemy_spawner = root.get_child(4)
+	else:
+		enemy_spawner = root.get_child(3)
+	
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	iter += 1
+	if iter > 10:
+		_get_enemies()
+		iter = 0
+"
+
+[sub_resource type="GDScript" id="GDScript_uc6nb"]
+resource_name = "creature_brain"
+script/source = "extends Node2D
+
+@export var attack_speed = 1.0
+@export var movement_speed = 1.0
+@export var attack_range = 2.0
+@export var team = 1
+var iter = 0
+var target
+var parent
+
+
+func find_target():
+	var dist = 0
+	var best_dist = INF
+	var best_target = null
+	if parent.get_enemies() != null:
+		for e in parent.get_enemies():
+			dist = global_transform.origin.distance_to(e.global_transform.origin)
+			print(dist)
+			if dist < best_dist:
+				best_dist = dist
+			best_target = e
+			
+	return best_target
+
+func move(target_vec, delta):
+	if target_vec != null:
+		transform = transform.looking_at(target_vec)
+		transform = transform.translated((target_vec - transform.origin).normalized() * (delta * movement_speed))
+	
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	parent = get_parent()
+	
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	if target == null or iter > 10:
+		target = find_target()
+		iter = 0
+	move(target, delta)
+"
+
+[node name="_root" type="Node2D"]
+script = ExtResource("1_od3ax")
+
+[node name="background" type="Node2D" parent="."]
+modulate = Color(0, 0.647059, 0, 1)
+scale = Vector2(100, 100)
+
+[node name="Blank" type="Sprite2D" parent="background"]
+texture = ExtResource("1_e4s1a")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+editor_draw_limits = true
+
+[node name="ui canvas" type="Node2D" parent="."]
+
+[node name="gold label" type="Node2D" parent="ui canvas"]
+position = Vector2(-475, -475)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ui canvas/gold label"]
+offset_left = -441.0
+offset_top = -41.0
+offset_right = -8.0
+offset_bottom = 116.0
+theme = SubResource("Theme_rmj3c")
+theme_override_font_sizes/normal_font_size = 35
+bbcode_enabled = true
+text = "[color=yellow]GOLD:[/color]"
+scroll_active = false
+
+[node name="player_summoner" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="player_summoner"]
+position = Vector2(-860, 0)
+texture = ExtResource("3_orpee")
+
+[node name="enemy_spawner" type="Node2D" parent="player_summoner"]
+position = Vector2(800, 0)
+script = SubResource("GDScript_llqqx")
+
+[node name="elemental" type="Node2D" parent="player_summoner/enemy_spawner"]
+script = SubResource("GDScript_uc6nb")
+attack_speed = 2.0
+movement_speed = 50.0
+team = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="player_summoner/enemy_spawner/elemental"]
+texture = ExtResource("4_sxe8e")
+
+[node name="player_spawner" type="Node2D" parent="."]
+script = SubResource("GDScript_llqqx")
+team = 0
+
+[node name="elemental" type="Node2D" parent="player_spawner"]
+script = SubResource("GDScript_uc6nb")
+attack_speed = 2.0
+movement_speed = 50.0
+team = 0
+
+[node name="Sprite2D" type="Sprite2D" parent="player_spawner/elemental"]
+texture = ExtResource("4_sxe8e")
